@@ -197,12 +197,13 @@ class QWENTrainer:
             examples['text'],
             truncation=True,
             max_length=self.data_args.max_seq_length,
-            padding=False,
+            padding=False,  # Don't pad here, let data collator handle it
             return_tensors=None
         )
         
         # For causal LM, labels are the same as input_ids
-        outputs['labels'] = outputs['input_ids'].copy()
+        # Create a copy as a list to avoid reference issues
+        outputs['labels'] = [ids[:] for ids in outputs['input_ids']]
         
         return outputs
     
@@ -234,7 +235,8 @@ class QWENTrainer:
         # Data collator
         data_collator = DataCollatorForLanguageModeling(
             tokenizer=self.tokenizer,
-            mlm=False
+            mlm=False,
+            pad_to_multiple_of=8  # Pad to multiple of 8 for efficiency
         )
         
         # Initialize trainer
