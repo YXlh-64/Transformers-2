@@ -202,8 +202,8 @@ class QWENTrainer:
         )
         
         # For causal LM, labels are the same as input_ids
-        # Create a copy as a list to avoid reference issues
-        outputs['labels'] = [ids[:] for ids in outputs['input_ids']]
+        # Copy input_ids to labels - they should have the same structure
+        outputs['labels'] = outputs['input_ids'].copy()
         
         return outputs
     
